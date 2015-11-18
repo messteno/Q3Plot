@@ -13,11 +13,6 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <action name="actionMeshBuilder">
-   <property name="text">
-    <string>Редактор сеток</string>
-   </property>
-  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

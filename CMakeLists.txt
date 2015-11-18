@@ -14,7 +14,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ###
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0.0)
 project(q3plot)
 
 # Default configuration values. These must be before the project command or
@@ -28,7 +28,8 @@ set(PROJECT_VERSION "0.0.1")
 # Global CMake options
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
-SET(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Configure Qt
 find_package(Qt5Widgets REQUIRED)
