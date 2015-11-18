@@ -1,4 +1,5 @@
 build/
 bin/
 .ycm*
+CMakeLists.txt.user
 
