@@ -16,9 +16,12 @@ signals:
 
 public slots:
     void paintEvent(QPaintEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 
 private:
     Q3PlotFrame &view_;
+    QPoint lastPressedMousePoint_;
 };
 
 #endif // Q3PLOTVIEWPORT_H

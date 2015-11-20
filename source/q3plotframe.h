@@ -5,6 +5,21 @@
 #include <QPainter>
 #include "q3plotviewport.h"
 
+//class Q3PlotFrameContainer
+//{
+//public:
+//    enum LogicalPosition
+//    {
+//        LogicalTop = 1,
+//        LogicalRight = 2,
+//        LogicalBottom = 3,
+//        LogicalLeft = 4,
+//    };
+
+//private:
+
+//};
+
 class Q3PlotFrame : public QWidget
 {
     Q_OBJECT
@@ -14,6 +29,7 @@ public:
 
     Q3PlotViewport *viewport() const;
     virtual void drawViewport(QPainter &painter);
+    virtual void moveViewport(const QPoint &diff);
     void layoutChildren();
 
 signals:

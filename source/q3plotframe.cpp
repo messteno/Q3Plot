@@ -24,6 +24,11 @@ void Q3PlotFrame::drawViewport(QPainter &painter)
     Q_UNUSED(painter);
 }
 
+void Q3PlotFrame::moveViewport(const QPoint &diff)
+{
+    Q_UNUSED(diff);
+}
+
 void Q3PlotFrame::layoutChildren()
 {
     viewport_->setGeometry(rect());
@@ -32,7 +37,8 @@ void Q3PlotFrame::layoutChildren()
 
 bool Q3PlotFrame::event(QEvent *event)
 {
-    switch(event->type()) {
+    switch(event->type())
+    {
     case QEvent::Resize:
         layoutChildren();
     }

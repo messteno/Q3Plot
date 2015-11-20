@@ -18,6 +18,7 @@ public:
 
     void drawBackground(QPainter &painter, const QRectF &rect);
     void drawViewport(QPainter &painter);
+    void moveViewport(const QPoint &diff);
 
     QBrush backgroundBrush() const;
     void setBackgroundBrush(const QBrush &brush);

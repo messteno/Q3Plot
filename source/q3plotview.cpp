@@ -35,6 +35,30 @@ void Q3PlotView::drawViewport(QPainter &painter)
 
     drawBackground(backgroundPainter, window()->rect());
     painter.drawPixmap(QPoint(), backgroundPixmap);
+
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    if (scene_)
+        scene_->drawItems(painter);
+}
+
+void Q3PlotView::moveViewport(const QPoint &diff)
+{
+   if (!scene_)
+       return;
+
+   QRectF sceneRect = scene_->sceneRect();
+   if (sceneRect.isNull())
+       return;
+
+   // TODO: maybe wrap to a function
+   qreal sx = viewport_->width() / sceneRect.width();
+   qreal sy = viewport_->height() / sceneRect.height();
+   sceneRect.moveLeft(sceneRect.left() - diff.x() / sx);
+   sceneRect.moveTop(sceneRect.top() - diff.y() / sy);
+
+   scene_->setSceneRect(sceneRect);
+   update();
 }
 
 QBrush Q3PlotView::backgroundBrush() const

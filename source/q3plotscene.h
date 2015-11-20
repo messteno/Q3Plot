@@ -2,7 +2,10 @@
 #define Q3PLOTSCENE_H
 
 #include <QRectF>
+#include <QWidget>
 #include <QObject>
+
+#include "q3plotitem.h"
 
 class Q3PlotScene : public QObject
 {
@@ -16,6 +19,9 @@ public:
     QRectF sceneRect() const;
     void setSceneRect(const QRectF &rect);
 
+    void addItem(Q3PlotItem *item);
+    void drawItems(QPainter &painter);
+
 signals:
 
 public slots:
@@ -23,6 +29,8 @@ public slots:
 private:
     QRectF sceneRect_;
     bool hasSceneRect_;
+
+    QList<Q3PlotItem *> items_;
 };
 
 #endif // Q3PLOTSCENE_H
