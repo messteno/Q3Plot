@@ -56,7 +56,7 @@ void Q3PlotView::moveViewport(const QPoint &diff)
    qreal sx = viewport_->width() / sceneRect.width();
    qreal sy = viewport_->height() / sceneRect.height();
    sceneRect.moveLeft(sceneRect.left() - diff.x() / sx);
-   sceneRect.moveTop(sceneRect.top() - diff.y() / sy);
+   sceneRect.moveTop(sceneRect.top() + diff.y() / sy);
 
    scene_->setSceneRect(sceneRect);
    update();
@@ -93,8 +93,10 @@ QPointF Q3PlotView::mapToScene(const QPoint &point)
 
     qreal sceneX = sceneRect.left()
             + point.x() / (qreal) viewport_->width() * sceneRect.width();
-    qreal sceneY = sceneRect.top()
-            + point.y() / (qreal) viewport_->height() * sceneRect.height();
+    qreal sceneY = sceneRect.bottom()
+            - point.y() / (qreal) viewport_->height() * sceneRect.height();
+
+    qDebug() << sceneX << sceneY;
 
     return QPointF(sceneX, sceneY);
 }
