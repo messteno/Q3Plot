@@ -18,10 +18,12 @@ public slots:
     void paintEvent(QPaintEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
 
 private:
     Q3PlotFrame &view_;
     QPoint lastPressedMousePoint_;
+    qreal wheelDelta_;
 };
 
 #endif // Q3PLOTVIEWPORT_H

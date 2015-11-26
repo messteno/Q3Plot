@@ -11,7 +11,8 @@
 Q3PlotView::Q3PlotView(Q3PlotScene *scene, QWidget *parent) :
     Q3PlotFrame(parent),
     scene_(scene),
-    backgroundBrush_(QColor(0x1a, 0x1a, 0x1a))
+    backgroundBrush_(QColor(0x1a, 0x1a, 0x1a)),
+    constraints_(Q3PlotScene::OneToOneConstraints)
 {
 }
 
@@ -61,6 +62,43 @@ void Q3PlotView::moveViewport(const QPoint &diff)
    update();
 }
 
+void Q3PlotView::scaleViewport(const QPoint &pos, qreal scale)
+{
+    if (!scene_)
+        return;
+
+    QRectF sceneRect = scene_->sceneRect();
+    if (sceneRect.isNull())
+        return;
+
+    QPointF scenePos = mapToScene(pos);
+
+    QPointF topLeft = sceneRect.topLeft();
+    QPointF bottomRight = sceneRect.bottomRight();
+    sceneRect.setTopLeft(scenePos + scale * (topLeft - scenePos));
+    sceneRect.setBottomRight(scenePos + scale * (bottomRight - scenePos));
+
+    scene_->setSceneRect(sceneRect);
+    update();
+}
+
+QPointF Q3PlotView::mapToScene(const QPoint &point)
+{
+    if (!scene_)
+        return point;
+
+    QRectF sceneRect = scene_->sceneRect();
+    if (sceneRect.isNull())
+        return point;
+
+    qreal sceneX = sceneRect.left()
+            + point.x() / (qreal) viewport_->width() * sceneRect.width();
+    qreal sceneY = sceneRect.top()
+            + point.y() / (qreal) viewport_->height() * sceneRect.height();
+
+    return QPointF(sceneX, sceneY);
+}
+
 QBrush Q3PlotView::backgroundBrush() const
 {
     return backgroundBrush_;
@@ -72,6 +110,25 @@ void Q3PlotView::setBackgroundBrush(const QBrush &brush)
     update();
 }
 
+void Q3PlotView::setConstraints(Q3PlotScene::SceneSizeConstraints constraints)
+{
+    constraints_ = constraints;
+    scene_->setSceneRect(scene_->sceneRect(), viewport_->window()->rect(),
+                         constraints);
+    update();
+}
+
+void Q3PlotView::setSceneRect(const QRectF &rect)
+{
+    scene_->setSceneRect(rect, viewport_->window()->rect(), constraints_);
+    update();
+}
+
 void Q3PlotView::paintEvent(QPaintEvent *event)
 {
+}
+
+void Q3PlotView::resizeEvent(QResizeEvent *event)
+{
+
 }

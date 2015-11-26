@@ -29,6 +29,12 @@ void Q3PlotFrame::moveViewport(const QPoint &diff)
     Q_UNUSED(diff);
 }
 
+void Q3PlotFrame::scaleViewport(const QPoint &pos, qreal scale)
+{
+    Q_UNUSED(pos);
+    Q_UNUSED(scale);
+}
+
 void Q3PlotFrame::layoutChildren()
 {
     viewport_->setGeometry(rect());
