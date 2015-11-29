@@ -19,6 +19,11 @@ public:
     explicit Q3Plot(Q3PlotView *view, QWidget *parent = 0);
     ~Q3Plot();
 
+private slots:
+    void on_setOneToOneConstraintsButton_clicked();
+
+    void on_printScreenButton_clicked();
+
 private:
     void init();
 

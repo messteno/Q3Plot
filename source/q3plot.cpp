@@ -1,4 +1,5 @@
 #include <QMenuBar>
+#include <QFileDialog>
 
 #include "q3plot.h"
 #include "ui_q3plot.h"
@@ -34,4 +35,30 @@ void Q3Plot::init()
     pal.setColor(QPalette::Background, QColor(0x2a, 0x2a, 0x2a));
     this->setAutoFillBackground(true);
     this->setPalette(pal);
+}
+
+void Q3Plot::on_setOneToOneConstraintsButton_clicked()
+{
+    view_->setConstraints(Q3PlotScene::OneToOneConstraints);
+}
+
+void Q3Plot::on_printScreenButton_clicked()
+{
+    QFileDialog *fileDialog = new QFileDialog(this);
+    QString path = fileDialog->getSaveFileName(this, tr("Save as image"),
+                                               "../data",
+                                               tr("PNG file (*.png)"));
+
+    if (path.isEmpty())
+        return;
+
+    QFileInfo file(path);
+    if (file.suffix().isEmpty())
+        path += ".png";
+
+    QImage img(view_->size(), QImage::Format_ARGB32);
+    QPainter painter(&img);
+    view_->render(&painter);
+
+    img.save(path);
 }

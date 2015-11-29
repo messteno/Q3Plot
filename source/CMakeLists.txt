@@ -8,6 +8,7 @@ add_executable(q3plot
     q3plotframe.cpp
     q3plotview.cpp
     q3plotscene.cpp
+    q3plotaxis.cpp
     q3plotitem.cpp
 )
 

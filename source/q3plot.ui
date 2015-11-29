@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>354</width>
-    <height>43</height>
+    <height>44</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -24,19 +24,29 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="actionsLayout" stretch="0,0">
+    <layout class="QHBoxLayout" name="actionsLayout" stretch="0,0,0">
      <property name="sizeConstraint">
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
      <item>
-      <widget class="QToolButton" name="toolButton">
+      <widget class="QToolButton" name="setOneToOneConstraintsButton">
        <property name="font">
         <font>
          <family>FontAwesome</family>
         </font>
        </property>
+       <property name="text">
+        <string>1:1</string>
+       </property>
        <property name="checkable">
-        <bool>true</bool>
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="printScreenButton">
+       <property name="text">
+        <string>PrtSc</string>
        </property>
       </widget>
      </item>

@@ -4,30 +4,26 @@
 #include <QWidget>
 #include <QPainter>
 #include <QList>
+#include <QMap>
+#include <QBoxLayout>
+#include <QWidgetList>
 
 #include "q3plotviewport.h"
 
-class Q3PlotFrameContainer
-{
-public:
-    enum Position
-    {
-        Top = 1,
-        Right = 2,
-        Bottom = 3,
-        Left = 4,
-    };
-
-    Q3PlotFrameContainer();
-
-private:
-    QList<QWidget *> widgets_;
-};
+class Q3PlotFrameContainer;
+class Q3PlotAxis;
 
 class Q3PlotFrame : public QWidget
 {
     Q_OBJECT
 public:
+    enum LogicalPosition {
+        PositionLeft = 0,
+        PositionTop = 1,
+        PositionRight = 2,
+        PositionBottom = 3,
+    };
+
     explicit Q3PlotFrame(QWidget *parent = 0);
     virtual ~Q3PlotFrame();
 
@@ -40,10 +36,32 @@ public:
 signals:
 
 public slots:
-    bool event(QEvent *event);
 
 protected:
     Q3PlotViewport *viewport_;
+    QMap<LogicalPosition, Q3PlotFrameContainer*> frameContainers_;
+};
+
+class Q3PlotFrameContainer : public QWidget
+{
+    Q_OBJECT
+public:
+    Q3PlotFrameContainer(Q3PlotFrame::LogicalPosition position, QWidget *parent = 0);
+    void prependWidget(QWidget *widget);
+    void appendWidget(QWidget *widget);
+
+    QWidgetList widgets() const;
+
+    Q3PlotAxis* axis() const;
+    bool hasAxis() const;
+
+    QSize sizeHint() const;
+
+    static const int Margin = 6;
+
+private:
+    QBoxLayout *layout_;
+    Q3PlotFrame::LogicalPosition position_;
 };
 
 #endif // Q3PLOTFRAME_H
