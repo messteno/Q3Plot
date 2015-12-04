@@ -24,7 +24,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="actionsLayout" stretch="0,0,0">
+    <layout class="QHBoxLayout" name="actionsLayout" stretch="0,0,0,0">
      <property name="sizeConstraint">
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
@@ -47,6 +47,13 @@
       <widget class="QToolButton" name="printScreenButton">
        <property name="text">
         <string>PrtSc</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton">
+       <property name="text">
+        <string>Zoom</string>
        </property>
       </widget>
      </item>

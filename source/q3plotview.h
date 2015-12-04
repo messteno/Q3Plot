@@ -32,8 +32,7 @@ public:
     int tickLength() const;
     void setTickLength(int tickLength);
 
-    void setConstraints(Q3PlotScene::SceneSizeConstraints constraints);
-    void setSceneRect(const QRectF &rect);
+    void setAspectRatioMode(Qt::AspectRatioMode aspectRatioMode);
 
     virtual QSize sizeHint() const;
 
@@ -42,16 +41,25 @@ public:
     bool hasAxis(Q3PlotFrame::LogicalPosition axisPosition);
 //    void removeAxis(Q3PlotFrame::LogicalPosition axisPosition);
 
+    void layoutAndFit();
+
 signals:
+    void sceneRectUpdated(const QRectF &rect);
+
 public slots:
+    void setSceneRect(const QRectF &rect);
     virtual void paintEvent(QPaintEvent *event);
     virtual void resizeEvent(QResizeEvent *event);
 
 private:
+    void fitToView();
+
     Q3PlotScene *scene_;
     QColor backgroundColor_;
-    Q3PlotScene::SceneSizeConstraints constraints_;
+    Qt::AspectRatioMode aspectRatioMode_;
     int tickLength_;
+    QRectF sceneRect_;
+    QRectF unfitRect_;
 };
 
 #endif

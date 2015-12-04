@@ -39,7 +39,7 @@ void Q3Plot::init()
 
 void Q3Plot::on_setOneToOneConstraintsButton_clicked()
 {
-    view_->setConstraints(Q3PlotScene::OneToOneConstraints);
+    view_->setAspectRatioMode(Qt::KeepAspectRatio);
 }
 
 void Q3Plot::on_printScreenButton_clicked()

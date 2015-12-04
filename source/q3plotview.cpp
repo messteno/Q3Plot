@@ -13,9 +13,12 @@ Q3PlotView::Q3PlotView(Q3PlotScene *scene, QWidget *parent) :
     Q3PlotFrame(parent),
     scene_(scene),
     backgroundColor_(0x2a, 0x2a, 0x2a),
-    constraints_(Q3PlotScene::OneToOneConstraints),
+    aspectRatioMode_(Qt::IgnoreAspectRatio),
     tickLength_(5)
 {
+    setSceneRect(scene_->sceneRect());
+    connect(scene, SIGNAL(sceneRectUpdated(QRectF)),
+            this, SLOT(setSceneRect(QRectF)));
     setBackgroundColor(backgroundColor_);
 }
 
@@ -92,8 +95,21 @@ void Q3PlotView::drawViewport(QPainter &painter)
     }
 
     painter.setRenderHint(QPainter::Antialiasing);
-    if (scene_)
+    if (scene_) {
+        painter.save();
+        if (!sceneRect_.isNull())
+        {
+            painter.translate(-0.5, -0.5);
+            qreal sx = painter.window().width() / sceneRect_.width();
+            qreal sy = painter.window().height() / sceneRect_.height();
+            painter.scale(sx, -sy);
+            painter.translate(-sceneRect_.left(), -sceneRect_.bottom());
+        }
+        else
+            ; // TODO: calc sceneRect
         scene_->drawItems(painter);
+        painter.restore();
+    }
 }
 
 void Q3PlotView::moveViewport(const QPoint &diff)
@@ -101,7 +117,7 @@ void Q3PlotView::moveViewport(const QPoint &diff)
    if (!scene_)
        return;
 
-   QRectF sceneRect = scene_->sceneRect();
+   QRectF sceneRect = sceneRect_;
    if (sceneRect.isNull())
        return;
 
@@ -111,7 +127,7 @@ void Q3PlotView::moveViewport(const QPoint &diff)
    sceneRect.moveLeft(sceneRect.left() - diff.x() / sx);
    sceneRect.moveTop(sceneRect.top() + diff.y() / sy);
 
-   scene_->setSceneRect(sceneRect);
+   setSceneRect(sceneRect);
    update();
 }
 
@@ -120,20 +136,17 @@ void Q3PlotView::scaleViewport(const QPoint &pos, qreal scale)
     if (!scene_)
         return;
 
-    QRectF sceneRect = scene_->sceneRect();
-    if (sceneRect.isNull())
+    if (sceneRect_.isNull())
         return;
 
     QPointF scenePos = mapToScene(pos);
 
-    QPointF topLeft = sceneRect.topLeft();
-    QPointF bottomRight = sceneRect.bottomRight();
-    sceneRect.setTopLeft(scenePos + scale * (topLeft - scenePos));
-    sceneRect.setBottomRight(scenePos + scale * (bottomRight - scenePos));
+    QPointF topLeft = sceneRect_.topLeft();
+    QPointF bottomRight = sceneRect_.bottomRight();
+    sceneRect_.setTopLeft(scenePos + scale * (topLeft - scenePos));
+    sceneRect_.setBottomRight(scenePos + scale * (bottomRight - scenePos));
 
-    scene_->setSceneRect(sceneRect);
-    layoutChildren();
-    scene_->fitToSize(viewport_->size(), constraints_);
+    setSceneRect(sceneRect_);
     update();
 }
 
@@ -142,14 +155,13 @@ QPointF Q3PlotView::mapToScene(const QPoint &point)
     if (!scene_)
         return point;
 
-    QRectF sceneRect = scene_->sceneRect();
-    if (sceneRect.isNull())
+    if (sceneRect_.isNull())
         return point;
 
-    qreal sceneX = sceneRect.left()
-            + point.x() / (qreal) viewport_->width() * sceneRect.width();
-    qreal sceneY = sceneRect.bottom()
-            - point.y() / (qreal) viewport_->height() * sceneRect.height();
+    qreal sceneX = sceneRect_.left()
+            + point.x() / (qreal) viewport_->width() * sceneRect_.width();
+    qreal sceneY = sceneRect_.bottom()
+            - point.y() / (qreal) viewport_->height() * sceneRect_.height();
 
     return QPointF(sceneX, sceneY);
 }
@@ -159,17 +171,15 @@ QPoint Q3PlotView::mapFromScene(const QPointF &point)
     if (!scene_)
         return QPoint();
 
-    QRectF sceneRect = scene_->sceneRect();
-    if (sceneRect.isNull())
+    if (sceneRect_.isNull())
         return QPoint();
 
-    int viewportX = (point.x() - sceneRect.topLeft().x()) / sceneRect.width()
+    int viewportX = (point.x() - sceneRect_.topLeft().x()) / sceneRect_.width()
             * (viewport_->width() - 1);
     int viewportY = viewport_->height() - 1
-            - (point.y() - sceneRect.topLeft().y())
-            / sceneRect.height() * (viewport_->height() - 1);
+            - (point.y() - sceneRect_.topLeft().y())
+            / sceneRect_.height() * (viewport_->height() - 1);
     return QPoint(viewportX, viewportY);
-
 }
 
 QColor Q3PlotView::backgroundColor() const
@@ -199,18 +209,61 @@ void Q3PlotView::setTickLength(int tickLength)
     tickLength_ = tickLength;
 }
 
-void Q3PlotView::setConstraints(Q3PlotScene::SceneSizeConstraints constraints)
+void Q3PlotView::setAspectRatioMode(Qt::AspectRatioMode aspectRatioMode)
 {
-    constraints_ = constraints;
-    scene_->fitToSize(viewport_->size(), constraints_);
+    aspectRatioMode_ = aspectRatioMode;
+    layoutAndFit();
     update();
 }
 
 void Q3PlotView::setSceneRect(const QRectF &rect)
 {
-    scene_->setSceneRect(rect);
-    scene_->fitToSize(viewport_->size(), constraints_);
+    sceneRect_ = rect;
+    unfitRect_ = rect;
+    emit sceneRectUpdated(sceneRect_);
+
+    layoutAndFit();
     update();
+}
+
+void Q3PlotView::layoutAndFit()
+{
+    layoutChildren();
+
+    if (aspectRatioMode_ == Qt::IgnoreAspectRatio) {
+        return;
+    }
+
+    QSize prevViewportSize;
+
+    fitToView();
+
+    int iteration = 0;
+    do
+    {
+        prevViewportSize = viewport_->size();
+        layoutChildren();
+        fitToView();
+        iteration++;
+    } while ((viewport_->size().height() > prevViewportSize.height()
+              || viewport_->size().width() > prevViewportSize.width())
+             && (iteration < 3));
+}
+
+void Q3PlotView::fitToView()
+{
+    if (aspectRatioMode_ == Qt::IgnoreAspectRatio) {
+        return;
+    }
+
+    QRectF rect = unfitRect_;
+    qreal ratio = qMin(viewport_->width() / rect.width(),
+                       viewport_->height() / rect.height());
+    QPointF rectCenter = rect.center();
+    QPointF fitInViewSize(viewport_->width() / ratio, viewport_->height() / ratio);
+    sceneRect_ = QRectF(rectCenter - fitInViewSize / 2,
+                        rectCenter + fitInViewSize / 2);
+    emit sceneRectUpdated(sceneRect_);
 }
 
 QSize Q3PlotView::sizeHint() const
@@ -227,13 +280,11 @@ Q3PlotAxis* Q3PlotView::addAxis(Q3PlotFrame::LogicalPosition axisPosition)
     Q3PlotFrameContainer *container = frameContainers_[axisPosition];
     Q3PlotAxis *axis = new Q3PlotAxis(axisPosition, container);
 
-    axis->rerange(scene_->sceneRect());
-    connect(scene_, SIGNAL(sceneRectUpdated(QRectF)),
-            axis, SLOT(rerange(QRectF)));
+    axis->rerange(sceneRect_);
+    connect(this, SIGNAL(sceneRectUpdated(QRectF)), axis, SLOT(rerange(QRectF)));
     container->prependWidget(axis);
 
-    layoutChildren();
-    scene_->fitToSize(viewport_->size(), constraints_);
+    layoutAndFit();
     update();
 
     return axis;
@@ -257,6 +308,5 @@ void Q3PlotView::paintEvent(QPaintEvent *event)
 
 void Q3PlotView::resizeEvent(QResizeEvent *event)
 {
-    layoutChildren();
-    scene_->fitToSize(viewport_->size(), constraints_);
+    layoutAndFit();
 }

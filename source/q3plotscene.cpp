@@ -28,27 +28,9 @@ void Q3PlotScene::setSceneRect(const QRectF &rect)
 {
     if (rect != sceneRect_) {
         hasSceneRect_ = !rect.isNull();
-        unfitRect_ = rect;
         sceneRect_ = rect;
         emit sceneRectUpdated(sceneRect_);
     }
-}
-
-void Q3PlotScene::fitToSize(const QSize &window,
-                            Q3PlotScene::SceneSizeConstraints constraints)
-{
-    if (!hasSceneRect_ || constraints == ScaleToViewConstraints) {
-        return;
-    }
-
-    QRectF rect = unfitRect_;
-    qreal ratio = qMin(window.width() / rect.width(),
-                       window.height() / rect.height());
-    QPointF rectCenter = rect.center();
-    QPointF fitInViewSize(window.width() / ratio, window.height() / ratio);
-    sceneRect_ = QRectF(rectCenter - fitInViewSize / 2,
-                        rectCenter + fitInViewSize / 2);
-    emit sceneRectUpdated(sceneRect_);
 }
 
 void Q3PlotScene::addItem(Q3PlotItem *item)
@@ -66,21 +48,10 @@ void Q3PlotScene::drawItems(QPainter &painter)
     painter.save();
 
     QPen pen(Qt::white);
-    pen.setWidth(1);
+    pen.setWidth(0);
     pen.setCosmetic(true);
     painter.setPen(pen);
-
     painter.setBrush(QColor(0x53, 0x97, 0x32));
-
-    if (hasSceneRect_)
-    {
-        qreal sx = painter.window().width() / sceneRect_.width();
-        qreal sy = painter.window().height() / sceneRect_.height();
-        painter.scale(sx, -sy);
-        painter.translate(-sceneRect_.left(), -sceneRect_.bottom());
-    }
-    else
-        ; // TODO: calc sceneRect
 
     foreach(Q3PlotItem *item, items_)
         item->draw(painter);
