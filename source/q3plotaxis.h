@@ -18,7 +18,7 @@ public:
     const QVector<int> tickPositions() const;
     int maxLabelWidth() const;
     void setLabelsVisible(bool labelsVisible);
-    QSize sizeHint() const;
+    virtual QSize sizeHint() const;
 
 signals:
 
@@ -26,7 +26,7 @@ public slots:
     virtual void paintEvent(QPaintEvent *event);
     void rerange(const QRectF &rect);
 
-private:
+protected:
     void generateAutoTicks();
     int coordinateToPixel(qreal coordinate) const;
 

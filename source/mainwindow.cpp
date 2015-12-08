@@ -32,6 +32,8 @@ MainWindow::MainWindow(QWidget *parent) :
     view->addAxis(Q3PlotFrame::PositionRight)->setLabelsVisible(false);
     view->addAxis(Q3PlotFrame::PositionBottom);
 
+    view->addColorBar(Q3PlotFrame::PositionRight, -10, 10)->setLabelsVisible(false);
+
     Q3Plot *plot = new Q3Plot(view, this);
     this->setCentralWidget(plot);
 }

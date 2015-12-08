@@ -7,6 +7,7 @@
 #include <QStyleOption>
 
 #include "q3plotaxis.h"
+#include "q3plotcolorbar.h"
 #include "q3plotview.h"
 
 Q3PlotView::Q3PlotView(Q3PlotScene *scene, QWidget *parent) :
@@ -300,6 +301,21 @@ Q3PlotAxis* Q3PlotView::axis(Q3PlotFrame::LogicalPosition axisPosition)
 {
     Q3PlotFrameContainer *container = frameContainers_[axisPosition];
     return container->axis();
+}
+
+Q3PlotColorBar* Q3PlotView::addColorBar(Q3PlotFrame::LogicalPosition colorBarPosition,
+                                        qreal lower, qreal upper)
+{
+    Q3PlotFrameContainer *container = frameContainers_[colorBarPosition];
+    Q3PlotColorBar *colorBar = new Q3PlotColorBar(colorBarPosition, container);
+
+    colorBar->setRange(lower, upper);
+    container->appendWidget(colorBar);
+
+    layoutAndFit();
+    update();
+
+    return colorBar;
 }
 
 void Q3PlotView::paintEvent(QPaintEvent *event)

@@ -7,6 +7,7 @@
 #include "q3plotscene.h"
 #include "q3plotframe.h"
 #include "q3plotaxis.h"
+#include "q3plotcolorbar.h"
 
 class Q3PlotView : protected Q3PlotFrame
 {
@@ -41,6 +42,8 @@ public:
     bool hasAxis(Q3PlotFrame::LogicalPosition axisPosition);
 //    void removeAxis(Q3PlotFrame::LogicalPosition axisPosition);
 
+    Q3PlotColorBar* addColorBar(Q3PlotFrame::LogicalPosition colorBarPosition,
+                                qreal lower, qreal upper);
     void layoutAndFit();
 
 signals:

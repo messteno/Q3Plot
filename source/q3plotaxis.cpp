@@ -41,7 +41,6 @@ void Q3PlotAxis::paintEvent(QPaintEvent *event)
     painter.setPen(Qt::white);
 
     QFontMetrics fm(font());
-    QSize size = sizeHint();
     QVector<int> tp = tickPositions();
     int margin = Q3PlotFrameContainer::Margin;
 
@@ -53,7 +52,7 @@ void Q3PlotAxis::paintEvent(QPaintEvent *event)
                         || tp[i] + margin + fm.height() / 3. > height()) {
                     continue;
                 }
-                painter.drawText(QPointF(size.width() - margin - fm.width(labels_[i]) - 1,
+                painter.drawText(QPointF(width() - margin - fm.width(labels_[i]) - 1,
                                          tp[i] + margin + fm.height() / 3),
                                  labels_[i]);
             }
@@ -67,7 +66,7 @@ void Q3PlotAxis::paintEvent(QPaintEvent *event)
                     continue;
                 }
                 painter.drawText(QPointF(tp[i] + margin - fm.width(labels_[i]) / 2,
-                                         size.height() - margin - 1), labels_[i]);
+                                         height() - margin - 1), labels_[i]);
             }
         }
         break;

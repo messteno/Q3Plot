@@ -10,6 +10,8 @@ add_executable(q3plot
     q3plotscene.cpp
     q3plotaxis.cpp
     q3plotitem.cpp
+    q3plotcolorbar.cpp
+    q3plotcolormap.cpp
 )
 
 qt5_use_modules(q3plot Widgets)
